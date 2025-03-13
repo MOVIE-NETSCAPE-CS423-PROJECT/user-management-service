@@ -2,6 +2,7 @@ package com.movienetscape.usermanagementservice.model;
 
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class UserVerification {
 
     @Id

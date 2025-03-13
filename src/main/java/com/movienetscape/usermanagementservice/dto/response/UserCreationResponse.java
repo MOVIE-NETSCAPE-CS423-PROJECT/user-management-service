@@ -8,11 +8,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Immutable
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserCreationResponse {
 

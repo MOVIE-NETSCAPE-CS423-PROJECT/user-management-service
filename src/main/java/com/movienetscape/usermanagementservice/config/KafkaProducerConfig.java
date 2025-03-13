@@ -19,8 +19,14 @@ import java.util.Map;
 public class KafkaProducerConfig {
 
 
-    public NewTopic userRegisteredTopic() {
+    @Bean
+    public NewTopic userVerifiedTopic() {
         return new NewTopic("user-verified-topic", 1, (short) 1);
+    }
+
+    @Bean
+    public NewTopic userRegisteredTopic() {
+        return new NewTopic("user-registered-topic", 1, (short) 1);
     }
 
     @Bean

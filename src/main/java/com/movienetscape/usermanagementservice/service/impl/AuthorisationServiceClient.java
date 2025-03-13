@@ -1,4 +1,4 @@
-package com.movienetscape.usermanagementservice.service;
+package com.movienetscape.usermanagementservice.service.impl;
 
 import com.movienetscape.usermanagementservice.dto.request.UserCredentialRegistrationRequest;
 import org.springframework.stereotype.Service;
