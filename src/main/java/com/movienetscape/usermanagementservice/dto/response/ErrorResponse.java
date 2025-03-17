@@ -12,9 +12,9 @@ import org.springframework.http.HttpStatus;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Immutable
+
 public class ErrorResponse  {
 
-   private String message;
+   private SimpleMessageResponse response;
 
 }

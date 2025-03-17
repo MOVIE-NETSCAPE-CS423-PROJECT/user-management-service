@@ -17,5 +17,6 @@ public class UserRegistrationResponse {
 
     private String message;
     private User user;
+    private Plan userSelectedPlan;
 
 }

@@ -1,8 +1,11 @@
 package com.movienetscape.usermanagementservice.controller;
 
+import com.movienetscape.usermanagementservice.dto.request.UpdateUserRequest;
 import com.movienetscape.usermanagementservice.dto.request.UserRegistrationRequest;
+import com.movienetscape.usermanagementservice.dto.request.VerifyTokenRequest;
+import com.movienetscape.usermanagementservice.dto.response.SimpleMessageResponse;
+import com.movienetscape.usermanagementservice.dto.response.UpdateUserResponse;
 import com.movienetscape.usermanagementservice.dto.response.UserRegistrationResponse;
-import com.movienetscape.usermanagementservice.dto.response.UserCreationResponse;
 import com.movienetscape.usermanagementservice.service.contract.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,23 +27,25 @@ public class UserController {
     @PostMapping("/register")
     public Mono<ResponseEntity<UserRegistrationResponse>> registerUser(@Valid @RequestBody UserRegistrationRequest request) {
         log.info("Received user registration request for email: {}", request.getEmail());
-
         return userService.registerUser(request)
                 .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 
-    @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@RequestParam String token) {
-        userService.verifyUser(token);
-        return ResponseEntity.status(HttpStatus.OK).body("Verified");
+    @PostMapping("/verify")
+    public ResponseEntity<SimpleMessageResponse> verifyUser(@RequestBody VerifyTokenRequest verifyTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.verifyUser(verifyTokenRequest.getToken()));
     }
 
-    @GetMapping("/{email}")
-    public Mono<ResponseEntity<UserCreationResponse>> getUserByEmail(@PathVariable String email) {
-        log.info("Fetching user details for email: {}", email);
 
-        return userService.getUserByEmail(email)
-                .map(response -> ResponseEntity.status(HttpStatus.OK).body(response));
+    @PostMapping("/forgot-password")
+    public ResponseEntity<SimpleMessageResponse> forgotPassword(@RequestBody VerifyTokenRequest verifyTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.verifyUser(verifyTokenRequest.getToken()));
+    }
+
+
+    @PutMapping("/update-info")
+    public Mono<ResponseEntity<UpdateUserResponse>> updateUser(@RequestBody UpdateUserRequest request) {
+        return userService.updateUser(request).map((response) -> ResponseEntity.status(HttpStatus.OK).body(response));
     }
 }
 

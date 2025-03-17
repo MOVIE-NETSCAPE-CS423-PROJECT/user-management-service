@@ -1,4 +1,4 @@
-package com.movienetscape.usermanagementservice.messaging.event;
+package com.movienetscape.usermanagementservice.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,12 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserRegisteredEvent {
-
+@AllArgsConstructor
+@Builder
+public class VerifyTokenRequest {
     private String token;
-    private String emailAddress;
 }
-

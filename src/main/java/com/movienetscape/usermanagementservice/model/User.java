@@ -33,6 +33,9 @@ public class User {
     @Column(nullable = false)
     private boolean verified;
 
+    @Column
+    private String profileImageUrl;
+
 
     public void activateAccount() {
         this.active = true;

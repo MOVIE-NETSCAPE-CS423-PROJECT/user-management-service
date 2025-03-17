@@ -1,16 +1,11 @@
 package com.movienetscape.usermanagementservice.model;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,19 +17,21 @@ public class UserVerification {
 
     @Id
     @Column(unique = true)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     @Column(unique = true)
     private String token;
 
-    @Column(unique = true)
+    @Column(nullable = false)
     private LocalDateTime tokenExpirationTime;
 
+
+    @Column(nullable = false)
     private boolean verified;
 
-    @Column(unique = true, nullable = false)
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 
 }
