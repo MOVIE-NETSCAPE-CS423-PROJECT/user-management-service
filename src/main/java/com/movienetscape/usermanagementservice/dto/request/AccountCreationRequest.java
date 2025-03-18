@@ -13,11 +13,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AccountCreationRequest {
 
+
     private String userId;
 
     private String firstName;
 
     private String lastName;
+
+    private String profileImageUrl;
+
+    private AddressDto addressDto;
 
     private Plan userSelectedPlan;
 

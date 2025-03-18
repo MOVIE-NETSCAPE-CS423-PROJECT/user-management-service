@@ -2,6 +2,7 @@ package com.movienetscape.usermanagementservice.messaging.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.movienetscape.usermanagementservice.messaging.event.UpdatedUserEvent;
 import com.movienetscape.usermanagementservice.messaging.event.UserRegisteredEvent;
 import com.movienetscape.usermanagementservice.messaging.event.UserVerifiedEvent;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,14 @@ public class KafkaEventProducerService {
     }
 
 
+
+    public void publishUpdatedUserEvent(UpdatedUserEvent updatedUserEvent) {
+        try {
+            String eventJson = objectMapper.writeValueAsString(updatedUserEvent);
+            kafkaTemplate.send("user-updated-topic", eventJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize user updated event", e);
+        }
+    }
 
 }

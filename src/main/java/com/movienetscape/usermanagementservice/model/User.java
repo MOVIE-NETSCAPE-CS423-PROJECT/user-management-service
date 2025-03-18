@@ -34,6 +34,9 @@ public class User {
     private boolean verified;
 
     @Column
+    private String activePlanName;
+
+    @Column
     private String profileImageUrl;
 
 

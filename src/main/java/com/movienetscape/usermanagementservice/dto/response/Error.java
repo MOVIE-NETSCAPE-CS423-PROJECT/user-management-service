@@ -1,20 +1,19 @@
 package com.movienetscape.usermanagementservice.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Immutable;
-import org.springframework.http.HttpStatus;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class ErrorResponse  {
+public class Error {
 
-   private SimpleMessageResponse response;
+    private SimpleMessageResponse response;
 
 }

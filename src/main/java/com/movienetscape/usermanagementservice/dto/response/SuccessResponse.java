@@ -1,22 +1,21 @@
 package com.movienetscape.usermanagementservice.dto.response;
 
 
-import com.movienetscape.usermanagementservice.model.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Immutable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Immutable
-public class UserRegistrationResponse {
+public class SuccessResponse {
 
     private String message;
-    private User user;
-    private Plan userSelectedPlan;
+
+    private UserDto data;
+
 
 }

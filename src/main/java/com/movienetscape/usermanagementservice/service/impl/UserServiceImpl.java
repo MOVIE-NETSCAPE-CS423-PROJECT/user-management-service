@@ -1,6 +1,6 @@
 package com.movienetscape.usermanagementservice.service.impl;
 
-import com.movienetscape.usermanagementservice.dto.request.UpdateUserRequest;
+import com.movienetscape.usermanagementservice.dto.request.AddressDto;
 import com.movienetscape.usermanagementservice.dto.request.UserCredentialRegistrationRequest;
 import com.movienetscape.usermanagementservice.dto.request.UserRegistrationRequest;
 import com.movienetscape.usermanagementservice.dto.response.*;
@@ -40,10 +40,8 @@ public class UserServiceImpl implements UserService {
     private final KafkaEventProducerService kafkaEventProducer;
 
     @Override
-    public Mono<UserRegistrationResponse> registerUser(UserRegistrationRequest request) {
+    public Mono<SuccessResponse> registerUser(UserRegistrationRequest request) {
         log.info("Attempting to register user with email: {}", request.getEmail());
-
-
 
 
         return Mono.fromCallable(() -> userRepository.findByEmail(request.getEmail()))
@@ -56,13 +54,15 @@ public class UserServiceImpl implements UserService {
                 });
     }
 
-    private Mono<UserRegistrationResponse> createUserAccount(UserRegistrationRequest request) {
+    private Mono<SuccessResponse> createUserAccount(UserRegistrationRequest request) {
         User user = createUser(request);
 
         return accountServiceClient.createAccount(
-                request.getFirstname(),
-                        request.getLastname(),
                         request.getEmail(),
+                        request.getFirstname(),
+                        request.getLastname(),
+                        request.getAddressDto(),
+                        request.getProfileImageUrl(),
                         request.getUserSelectedPlan())
                 .doOnSuccess(response -> log.info("Account created for user {} with ID: {}", request.getEmail(), response.getAccountId()))
                 .flatMap(response -> authServiceClient.registerUserCredentials(
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 .publishOn(Schedulers.boundedElastic());
     }
 
-    private UserRegistrationResponse generateVerificationAndPublishEvent(User savedUser, Plan userSelectedPlan) {
+    private SuccessResponse generateVerificationAndPublishEvent(User savedUser, Plan userSelectedPlan) {
         String verificationToken = TokenGenerator.generateToken();
 
         UserVerification verification = UserVerification.builder()
@@ -109,23 +109,39 @@ public class UserServiceImpl implements UserService {
                         .build()
         );
 
-        return new UserRegistrationResponse(
-                "A verification mail has been sent to your email address: " + savedUser.getEmail(),
-                savedUser, userSelectedPlan
-        );
+        AddressDto addressDto = AddressDto.builder()
+                .zip(savedUser.getAddress().getZip())
+                .state(savedUser.getAddress().getState())
+                .city(savedUser.getAddress().getCity())
+                .street(savedUser.getAddress().getStreet())
+                .build();
+        UserDto userDto = UserDto.builder()
+                .activePlanName(savedUser.getActivePlanName())
+                .profileImageUrl(savedUser.getProfileImageUrl())
+                .firstName(savedUser.getFirstName())
+                .lastName(savedUser.getLastName())
+                .addressDto(addressDto)
+                .userId(savedUser.getEmail())
+                .build();
+
+
+        return SuccessResponse.builder()
+                .message("User created successfully")
+                .data(userDto)
+                .build();
     }
 
     @Override
     public SimpleMessageResponse verifyUser(String token) {
         UserVerification verification = verificationRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
+                .orElseThrow(() -> new BadRequestException("The token is invalid"));
 
         if (!isTokenValid(verification)) {
             throw new TokenExpiredException("Token is expired or already verified");
         }
 
         User user = userRepository.findById(verification.getUser().getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         user.setVerified(true);
         userRepository.save(user);
@@ -146,33 +162,47 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public Mono<UpdateUserResponse> updateUser(UpdateUserRequest request) {
+    public Mono<SuccessResponse> updateUser(UserRegistrationRequest request) {
         User user = userRepository.findById(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid parameters passed"));
 
         user.setProfileImageUrl(request.getProfileImageUrl());
         user.setAddress(
-                new Address(request.getStreet(),
-                        request.getCity(),
-                        request.getState(),
-                        request.getZip()));
+                new Address(request.getAddressDto().getStreet(),
+                        request.getAddressDto().getCity(),
+                        request.getAddressDto().getState(),
+                        request.getAddressDto().getZip()));
         user.setLastName(request.getLastname());
         user.setFirstName(request.getFirstname());
         user.setEmail(request.getEmail());
         user.setProfileImageUrl(request.getProfileImageUrl());
 
-        userRepository.save(user);
+
+        User updatedUser = userRepository.save(user);
+
+        AddressDto addressDto = AddressDto.builder()
+                .zip(updatedUser.getAddress().getZip())
+                .city(updatedUser.getAddress().getCity())
+                .state(updatedUser.getAddress().getState())
+                .street(updatedUser.getAddress().getStreet())
+                .build();
+
+        UserDto userDto = UserDto.builder()
+                .activePlanName(updatedUser.getActivePlanName())
+                .userId(updatedUser.getEmail())
+                .profileImageUrl(updatedUser.getProfileImageUrl())
+                .firstName(updatedUser.getFirstName())
+                .lastName(updatedUser.getLastName())
+                .addressDto(addressDto)
+                .build();
+
+
+        accountServiceClient.publishUpdatedUser(userDto);
 
         return Mono.just(
-                new UpdateUserResponse(
-                        user.getFirstName(),
-                        user.getLastName(),
-                        user.getEmail(),
-                        user.getAddress().getStreet(),
-                        user.getAddress().getCity(),
-                        user.getAddress().getState(),
-                        user.getAddress().getZip(),
-                        user.getProfileImageUrl()
+                new SuccessResponse(
+                        "User Created Successfully",
+                        userDto
                 ));
     }
 
