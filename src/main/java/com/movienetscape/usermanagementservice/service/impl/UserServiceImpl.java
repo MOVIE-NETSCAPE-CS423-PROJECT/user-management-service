@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
                         request.getEmail(),
                         request.getFirstname(),
                         request.getLastname(),
-                        request.getAddressDto(),
+                        request.getAddress(),
                         request.getProfileImageUrl(),
                         request.getUserSelectedPlan())
                 .doOnSuccess(response -> log.info("Account created for user {} with ID: {}", request.getEmail(), response.getAccountId()))
@@ -168,10 +168,10 @@ public class UserServiceImpl implements UserService {
 
         user.setProfileImageUrl(request.getProfileImageUrl());
         user.setAddress(
-                new Address(request.getAddressDto().getStreet(),
-                        request.getAddressDto().getCity(),
-                        request.getAddressDto().getState(),
-                        request.getAddressDto().getZip()));
+                new Address(request.getAddress().getStreet(),
+                        request.getAddress().getCity(),
+                        request.getAddress().getState(),
+                        request.getAddress().getZip()));
         user.setLastName(request.getLastname());
         user.setFirstName(request.getFirstname());
         user.setEmail(request.getEmail());
@@ -201,7 +201,7 @@ public class UserServiceImpl implements UserService {
 
         return Mono.just(
                 new SuccessResponse(
-                        "User Created Successfully",
+                        "Updating... User",
                         userDto
                 ));
     }

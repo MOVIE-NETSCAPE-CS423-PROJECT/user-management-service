@@ -37,7 +37,7 @@ public class UserRegistrationRequest {
     @Email
     private String email;
 
-    private AddressDto addressDto;
+    private AddressDto address;
 
     @NotBlank(message = "Password can't be blank")
     private String password;

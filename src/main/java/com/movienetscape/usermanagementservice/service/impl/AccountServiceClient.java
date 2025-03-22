@@ -62,7 +62,6 @@ public class AccountServiceClient {
                         .lastName(userDto.getLastName())
                         .firstName(userDto.getFirstName())
                         .profileImageUrl(userDto.getProfileImageUrl())
-                        .activePlanName(userDto.getActivePlanName())
                         .userId(userDto.getUserId())
                         .build()
         );
